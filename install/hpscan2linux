@@ -1,0 +1,65 @@
+#!/bin/sh
+if [ true != "$INIT_D_SCRIPT_SOURCED" ] ; then
+    set "$0" "$@"; INIT_D_SCRIPT_SOURCED=true . /lib/init/init-d-script
+fi
+### BEGIN INIT INFO
+# Provides:          hpscan2linux
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: HP Scan-to-folder service
+# Description:       This file should be used to construct scripts to be
+#                    placed in /etc/init.d.  This example start a
+#                    single forking daemon capable of writing a pid
+#                    file.  To get other behavoirs, implemend
+#                    do_start(), do_stop() or other functions to
+#                    override the defaults in /lib/init/init-d-script.
+### END INIT INFO
+
+# Author:  Darovskikh Andrey
+#
+# Please remove the "Author" lines above and replace them
+# with your own name if you copy and modify this script.
+
+DESC="HP Scan-to-folder Linux"
+NAME=hpscan2linux
+DAEMON=/usr/bin/$NAME.jar
+PID_DIR=/var/run
+PID=$PID_DIR/$NAME.pid
+LOGFILE=/var/log/hpscan2linux.log
+
+case "$1" in
+  start)
+    echo "Starting hpscan2linux service"
+    if [ ! -f $PID ]; then
+        echo "$NAME starting ..."
+        sudo -u scanuser java -jar $DAEMON >&- 2>>$LOGFILE &
+        echo $! > $PID
+        echo "$NAME started ..." 
+    else
+        echo "$NAME is already running ...";
+    fi
+    ;;
+  stop)
+    echo "Stopping hpscan2linux"
+    if [ -f $PID ]; then
+        PID_ID=$(cat $PID_DIR/$NAME.pid);
+        echo "Stopping $NAME ..."
+            kill $PID_ID;
+            echo "$NAME stopped ..."
+            rm $PID
+        else
+            echo "$NAME is not running ..."
+        fi
+    ;;
+  restart)
+    echo "Restarting hpscan@linux service"
+    ;;
+  *)
+    echo "Usage: /etc/init.d/hpscan2linux {start|stop|restart}"
+    exit 1
+    ;;
+esac
+
+exit 0
