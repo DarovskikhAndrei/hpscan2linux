@@ -1,10 +1,7 @@
 package HPScan2Linux.HPScan2Linux;
 
-import java.io.InputStream;
-
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.utils.URIBuilder;
 
 import com.sun.org.apache.xerces.internal.util.URI;
 import com.sun.org.apache.xerces.internal.util.URI.MalformedURIException;

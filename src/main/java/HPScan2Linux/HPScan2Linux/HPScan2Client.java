@@ -47,18 +47,16 @@ public class HPScan2Client {
 				executeEvent(EventFactory.createEvent("/WalkupScanToComp/WalkupScanToCompDestinations", new RegisterRequestBuilder()));
 				executeEvent(EventFactory.createEvent("/WalkupScanToComp/WalkupScanToCompDestinations"));
 			} catch (ClientProtocolException e) {
-				e.printStackTrace();
+				System.err.println("ClientProtocolException exception in registration");
 				try {
 					Thread.sleep(3000);
 				} catch (InterruptedException e1) {
-					e1.printStackTrace();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.err.println("IOException exception in registration");
 				try {
 					Thread.sleep(3000);
 				} catch (InterruptedException e1) {
-					e1.printStackTrace();
 				}
 			}
 		}

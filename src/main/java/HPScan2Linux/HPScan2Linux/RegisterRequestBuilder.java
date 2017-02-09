@@ -47,17 +47,9 @@ public class RegisterRequestBuilder extends RequestHelper {
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.transform(new DOMSource(document), new StreamResult(outWriter));
 		} catch (ParserConfigurationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (TransformerFactoryConfigurationError e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		
 		return outWriter.toString();

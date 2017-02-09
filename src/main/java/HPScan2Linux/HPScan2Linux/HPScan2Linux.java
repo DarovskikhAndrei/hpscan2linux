@@ -38,8 +38,7 @@ public class HPScan2Linux
 		try {
 			client.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	    	System.err.println("close ioexception");
 		}
     }
     

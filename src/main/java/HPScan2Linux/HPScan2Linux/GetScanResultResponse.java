@@ -41,11 +41,7 @@ public class GetScanResultResponse extends ResponseExecutor {
 			
 			fos.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		finally {
 			StateService.getInstance().setBinaryURL(null);
@@ -79,17 +75,9 @@ public class GetScanResultResponse extends ResponseExecutor {
 					return "jpg";
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return "";
 	}

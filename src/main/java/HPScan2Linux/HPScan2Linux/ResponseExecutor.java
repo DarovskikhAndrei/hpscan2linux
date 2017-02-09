@@ -30,8 +30,6 @@ public abstract class ResponseExecutor {
 			try {
 				inStream = entity.getContent();
 			} catch (UnsupportedOperationException | IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 			if (entity.getContentLength() != 0) {
 				return inStream;

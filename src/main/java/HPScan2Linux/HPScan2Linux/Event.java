@@ -38,7 +38,7 @@ public class Event {
 	public String getResourceType() {
 		return m_resourceType;
 	}
-	
+
 	public String getResourceURI() {
 		return m_resourceURI;
 	}
