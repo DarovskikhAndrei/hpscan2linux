@@ -26,8 +26,8 @@ public class ScanJobsRequest extends RequestHelper {
 			
 			return result;
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("file " + m_profile + " not found");
+//			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
