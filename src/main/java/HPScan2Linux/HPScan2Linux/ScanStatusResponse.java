@@ -27,6 +27,7 @@ public class ScanStatusResponse extends ResponseExecutor {
 			Document doc = getXMLDocument(inStream);
 			
 			m_scanStatus = getXMLParam(doc, "ScannerState", "http://www.hp.com/schemas/imaging/con/cnx/scan/2008/08/19");
+			System.err.println("Scaner status: " + m_scanStatus);
 		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

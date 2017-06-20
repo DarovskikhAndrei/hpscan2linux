@@ -45,6 +45,10 @@ public class ScanJobListResponse extends ResponseExecutor {
 			m_jobBinaryURL = getXMLParam(doc, "BinaryURL", "http://www.hp.com/schemas/imaging/con/cnx/scan/2008/08/19");
 			StateService.getInstance().setBinaryURL(m_jobBinaryURL);
 			
+			System.err.println("JobList result start:");
+			System.err.println("  Page state: " + m_jobPageState);
+			System.err.println("  BinaryURL: " + m_jobBinaryURL);
+			System.err.println("JobList result end");
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {

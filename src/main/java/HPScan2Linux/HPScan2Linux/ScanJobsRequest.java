@@ -5,39 +5,49 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class ScanJobsRequest extends RequestHelper {
-	public ScanJobsRequest() {
+public class ScanJobsRequest extends RequestHelper
+{
+	public ScanJobsRequest()
+	{
 		m_profile = StateService.getInstance().getProfile();
 	}
 
 	@Override
-	public String getBody() {
+	public String getBody()
+	{
 		String profiles = SettingsProvider.getSettings().getProfilesPath();
 		File file = new File(profiles + m_profile + ".xml");
-		try {
+		try
+		{
 			FileInputStream buf = new FileInputStream(file);
 			String result = "";
 			int chr = -1;
-			while((chr = buf.read()) != -1) {
-				result+=(char)chr;
-			}				
-			
+			while ((chr = buf.read()) != -1)
+			{
+				result += (char) chr;
+			}
+
 			buf.close();
-			
+
 			return result;
-		} catch (FileNotFoundException e) {
+		}
+		catch (FileNotFoundException e)
+		{
 			System.err.println("file " + m_profile + " not found");
-//			e.printStackTrace();
-		} catch (IOException e) {
+			// e.printStackTrace();
+		}
+		catch (IOException e)
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return "";
 	}
 
 	@Override
-	public String contentType() {
+	public String contentType()
+	{
 		return "text/xml";
 	}
 

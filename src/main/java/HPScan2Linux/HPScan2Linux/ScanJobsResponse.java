@@ -10,7 +10,6 @@ public class ScanJobsResponse extends ResponseExecutor {
 
 	@Override
 	public void init(HttpResponse response) {
-		// TODO Auto-generated method stub
 		m_url = null;
 		if (response != null) {
 			Header[] headers = response.getAllHeaders();
@@ -21,7 +20,6 @@ public class ScanJobsResponse extends ResponseExecutor {
 					try {
 						uri = new URI(url);
 					} catch (MalformedURIException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					if (uri != null)
