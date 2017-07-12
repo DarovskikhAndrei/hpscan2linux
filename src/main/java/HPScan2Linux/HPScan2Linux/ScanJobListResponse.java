@@ -15,7 +15,10 @@ public class ScanJobListResponse extends ResponseExecutor {
 		// если задание не выполнено.. повторим запрос.
 		
 		if (m_jobPageState != null && m_jobPageState.equalsIgnoreCase("ReadyToUpload"))
+		{
+            System.err.println("Add download event with url: " + m_jobBinaryURL);
 			m_events.add(new Event(m_jobBinaryURL, "", "GET", new GetScanResultResponse(), null));
+		}
 		else if (m_jobState != null && m_jobState.equalsIgnoreCase("canceled")) {
 			m_events.add(EventFactory.createEvent("/EventMgmt/EventTable"));	
 		}

@@ -28,6 +28,8 @@ public class GetScanResultResponse extends ResponseExecutor {
 		String fileName = getFileName();
 		String fullFileName = path + fileName;
 		
+        System.err.println("Downloading: " + fullFileName);
+        
 		try {
 			FileOutputStream fos = new FileOutputStream(fullFileName);
 			
@@ -40,8 +42,12 @@ public class GetScanResultResponse extends ResponseExecutor {
 			}
 			
 			fos.close();
+			
+	        System.err.println("Downloading finished. No Errors");
 		} catch (FileNotFoundException e) {
+		    e.printStackTrace();
 		} catch (IOException e) {
+            e.printStackTrace();
 		}
 		finally {
 			StateService.getInstance().setBinaryURL(null);
