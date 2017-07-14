@@ -20,6 +20,11 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
+import HPScan2Linux.HPScan2Linux.events.Event;
+import HPScan2Linux.HPScan2Linux.events.EventFactory;
+import HPScan2Linux.HPScan2Linux.events.ResponseExecutor;
+import HPScan2Linux.HPScan2Linux.events.WalkupScanToCompDestinationResponse;
+
 public class HPScan2Client {
 	public HPScan2Client() {
 		m_requestQueue = new LinkedList<Event>();

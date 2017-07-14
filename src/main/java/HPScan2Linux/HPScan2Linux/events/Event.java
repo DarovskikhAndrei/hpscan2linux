@@ -1,8 +1,10 @@
-package HPScan2Linux.HPScan2Linux;
+package HPScan2Linux.HPScan2Linux.events;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import HPScan2Linux.HPScan2Linux.RequestHelper;
 
 public class Event {
 	public Event(String url, String type, String method, ResponseExecutor responseExecutor, RequestHelper requestHelper) {

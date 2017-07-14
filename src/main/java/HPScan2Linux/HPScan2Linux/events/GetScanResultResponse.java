@@ -1,4 +1,4 @@
-package HPScan2Linux.HPScan2Linux;
+package HPScan2Linux.HPScan2Linux.events;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,12 +10,18 @@ import java.io.InputStream;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.HttpResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-public class GetScanResultResponse extends ResponseExecutor
+import HPScan2Linux.HPScan2Linux.SettingsProvider;
+import HPScan2Linux.HPScan2Linux.StateService;
+
+public final class GetScanResultResponse extends ResponseExecutor
 {
     private static final int kBlockSize = 4096;
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventFactory.class);
     
     @Override
     public void execute()
@@ -33,8 +39,6 @@ public class GetScanResultResponse extends ResponseExecutor
         String fileName = getFileName();
         String fullFileName = path + fileName;
 
-        System.err.println("Downloading: " + fullFileName);
-
         try (FileOutputStream fos = new FileOutputStream(fullFileName))
         {
             int readed = 0;
@@ -46,15 +50,15 @@ public class GetScanResultResponse extends ResponseExecutor
                 fos.write(bytes, pos, readed);
             }
 
-            System.err.println("Downloading finished. No Errors");
+            LOGGER.info("Downloaded: {}", fullFileName);
         }
         catch (FileNotFoundException e)
         {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         finally
         {
@@ -95,16 +99,22 @@ public class GetScanResultResponse extends ResponseExecutor
         }
         catch (FileNotFoundException e)
         {
+            LOGGER.error(e.getMessage());
         }
         catch (IOException e)
         {
+            LOGGER.error(e.getMessage());
         }
         catch (ParserConfigurationException e)
         {
+            LOGGER.error(e.getMessage());
         }
         catch (SAXException e)
         {
+            LOGGER.error(e.getMessage());
         }
+        
+        LOGGER.error("file exception not valid");
         return "";
     }
 }
