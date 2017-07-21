@@ -1,0 +1,14 @@
+[Unit]
+Description=hpscan2linux
+After=network.target
+[Service]
+Environment=JAVA_HOME=/opt/java
+ExecStart=/opt/java/bin/java -jar /usr/bin/hpscan2linux.jar
+Type=simple
+User=scanuser
+Restart=on-failure
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=hpscan2linux
+[Install]
+WantedBy=multi-user.target
