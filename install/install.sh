@@ -7,7 +7,10 @@ read -p "Enter folder for scaned images:" -e scanpath
 #coping files and scripts
 cp ../target/HPScan2Linux-1.0.1-jar-with-dependencies.jar /usr/bin/hpscan2linux.jar
 cp profiles /etc/scanserver/
+chmod +x hpscan2linux
 cp hpscan2linux /etc/init.d/
+cp hpscan2linux.service /etc/systemd/system/
+systemct enable hpscan2linux.service
 
 #add user for daemon
 useradd -U scanuser
