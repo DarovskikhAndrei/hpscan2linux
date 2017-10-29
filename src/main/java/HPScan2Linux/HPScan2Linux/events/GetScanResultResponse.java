@@ -9,6 +9,8 @@ import java.io.InputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import HPScan2Linux.HPScan2Linux.internal.FileNameResolver;
+import HPScan2Linux.HPScan2Linux.internal.FileNameResolverFactory;
 import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +22,7 @@ import HPScan2Linux.HPScan2Linux.StateService;
 
 public final class GetScanResultResponse extends ResponseExecutor
 {
-    private static final int kBlockSize = 4096;
+    private static final int kBlockSize = 8192;
     private static final Logger LOGGER = LoggerFactory.getLogger(EventFactory.class);
     
     @Override
@@ -41,7 +43,7 @@ public final class GetScanResultResponse extends ResponseExecutor
 
         try (FileOutputStream fos = new FileOutputStream(fullFileName))
         {
-            int readed = 0;
+            int readed;
             int pos = 0;
             byte bytes[] = new byte[kBlockSize];
 
@@ -70,51 +72,6 @@ public final class GetScanResultResponse extends ResponseExecutor
 
     private String getFileName()
     {
-        String filename = "";
-        StateService service = StateService.getInstance();
-        String url = service.getBinaryURL();
-        String ext = getProfileExt();
-        url = url.replaceAll("/", "_");
-
-        filename = url + "." + ext;
-
-        return filename;
-    }
-
-    private String getProfileExt()
-    {
-        String profiles = SettingsProvider.getSettings().getProfilesPath();
-        File file = new File(profiles + StateService.getInstance().getProfile() + ".xml");
-        try
-        {
-            FileInputStream buf = new FileInputStream(file);
-            Document doc = getXMLDocument(buf);
-            String format = getXMLParam(doc, "Format", "http://www.hp.com/schemas/imaging/con/cnx/scan/2008/08/19");
-            buf.close();
-            if (format != null)
-            {
-                if (format.equalsIgnoreCase("Jpeg"))
-                    return "jpg";
-            }
-        }
-        catch (FileNotFoundException e)
-        {
-            LOGGER.error(e.getMessage());
-        }
-        catch (IOException e)
-        {
-            LOGGER.error(e.getMessage());
-        }
-        catch (ParserConfigurationException e)
-        {
-            LOGGER.error(e.getMessage());
-        }
-        catch (SAXException e)
-        {
-            LOGGER.error(e.getMessage());
-        }
-        
-        LOGGER.error("file exception not valid");
-        return "";
+        return FileNameResolverFactory.createDefault().getFileName(StateService.getInstance());
     }
 }

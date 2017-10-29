@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class ScanJobsRequest extends RequestHelper
+public class ScanJobsRequest implements RequestHelper
 {
 	public ScanJobsRequest()
 	{
@@ -21,7 +21,7 @@ public class ScanJobsRequest extends RequestHelper
 		{
 			FileInputStream buf = new FileInputStream(file);
 			String result = "";
-			int chr = -1;
+			int chr;
 			while ((chr = buf.read()) != -1)
 			{
 				result += (char) chr;

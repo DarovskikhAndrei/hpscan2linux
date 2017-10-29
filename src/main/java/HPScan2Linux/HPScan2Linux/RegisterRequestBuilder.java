@@ -19,8 +19,8 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class RegisterRequestBuilder extends RequestHelper {
-	public RegisterRequestBuilder()
+class RegisterRequestBuilder implements RequestHelper {
+	RegisterRequestBuilder()
 	{
 		m_server = "localhost";
 		try {
@@ -46,11 +46,12 @@ public class RegisterRequestBuilder extends RequestHelper {
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.transform(new DOMSource(document), new StreamResult(outWriter));
-		} catch (ParserConfigurationException e1) {
-		} catch (TransformerConfigurationException e) {
-		} catch (TransformerFactoryConfigurationError e) {
-		} catch (TransformerException e) {
 		}
+		catch (ParserConfigurationException | TransformerFactoryConfigurationError | TransformerException e)
+		{
+
+		}
+
 		
 		return outWriter.toString();
 	}

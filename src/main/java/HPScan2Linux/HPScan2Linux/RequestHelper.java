@@ -1,8 +1,8 @@
 package HPScan2Linux.HPScan2Linux;
 
-interface RequestHelper
+public interface RequestHelper
 {
-    public abstract String getBody();
+    String getBody();
 
-    public abstract String contentType();
+    String contentType();
 }
