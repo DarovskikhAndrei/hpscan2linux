@@ -2,7 +2,6 @@ package com.dara.hpscan.internal;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.SocketTimeoutException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -15,11 +14,12 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dara.hpscan.IRequestBodyProvider;
 import com.dara.hpscan.SettingsProvider;
@@ -30,22 +30,22 @@ import com.dara.hpscan.internal.events.compdest.RegisterRequestBuilder;
 import com.dara.hpscan.internal.events.compdest.WalkupScanToCompDestinationResponse;
 import com.dara.hpscan.internal.events.def.DefaultEventRequest;
 
-public class HPScan2Client
+public final class HPScan2Client implements AutoCloseable
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HPScan2Client.class);
+
     private CloseableHttpClient httpClient;
 
     private final Queue<IEventRequest> requestQueue = new LinkedList<>();
 
     private String registredURL;
-
     private String proxyHost;
     private int proxyPort;
-
     private HttpHost host;
 
     private void do_init()
     {
-        System.err.println("init scaner");
+        LOGGER.info("init scaner client");
 
         while (registredURL != null)
         {
@@ -53,8 +53,9 @@ public class HPScan2Client
             {
                 executeEvent(EventFactory.createEvent("/WalkupScanToComp/WalkupScanToCompDestinations"));
                 executeEvent(new DefaultEventRequest(registredURL, "", "DELETE"));
+                LOGGER.info("Registration deleted {}", registredURL);
+
                 registredURL = null;
-                System.err.println("Deleted registration");
             }
             catch (ClientProtocolException e)
             {
@@ -74,28 +75,18 @@ public class HPScan2Client
                         "", new RegisterRequestBuilder()));
                 executeEvent(EventFactory.createEvent("/WalkupScanToComp/WalkupScanToCompDestinations"));
             }
-            catch (ClientProtocolException e)
+            catch (Exception e)
             {
                 try
                 {
-                    Thread.sleep(3000);
-                }
-                catch (InterruptedException e1)
-                {
-                }
-            }
-            catch (IOException e)
-            {
-                try
-                {
-                    Thread.sleep(3000);
+                    Thread.sleep(1000);
                 }
                 catch (InterruptedException e1)
                 {
                 }
             }
         }
-        System.err.println("Registred");
+        LOGGER.info("Scaner registered {}", registredURL);
 
         // Сразу добавим событие для обработки сообщений
         requestQueue.add(EventFactory.createEvent("/EventMgmt/EventTable"));
@@ -116,12 +107,13 @@ public class HPScan2Client
     }
 
     /* закрытие клиента */
+    @Override
     public void close() throws IOException
     {
         // удаляем регистрацию
         if (registredURL != null)
         {
-            System.err.println("close execute");
+            LOGGER.info("Close execute");
             executeEvent(new DefaultEventRequest(registredURL, "", "DELETE"));
         }
 
@@ -134,24 +126,9 @@ public class HPScan2Client
         {
             executeEvent(requestQueue.poll());
         }
-        catch (SocketTimeoutException e)
+        catch (Exception e)
         {
-            System.err.println("timeout exception");
-            do_init();
-        }
-        catch (HttpHostConnectException e)
-        {
-            System.err.println("HttpHostConnectException exception");
-            do_init();
-        }
-        catch (ClientProtocolException e)
-        {
-            System.err.println("ClientProtocolException exception");
-            do_init();
-        }
-        catch (IOException e)
-        {
-            System.err.println("IOException exception");
+            LOGGER.warn("Exception in process. ReInit");
             do_init();
         }
 
@@ -168,39 +145,41 @@ public class HPScan2Client
         }
     }
 
-    private void executeResponse(IEventRequest event, CloseableHttpResponse response)
+    private void onEventResponse(IEventRequest event, CloseableHttpResponse response)
             throws IOException
     {
-        if (response.getStatusLine().getStatusCode() < 400)
+        if (response.getStatusLine().getStatusCode() >= 400)
         {
-            IEventResultFactory factory = event.getEventResultFactory();
-            if (factory != null)
+            return;
+        }
+        IEventResultFactory factory = event.getEventResultFactory();
+        if (factory == null)
+        {
+            LOGGER.info("IEventResultFactory not defined for event {}", event);
+            return;
+        }
+        // инициализируем
+        Object data = factory.createData(response);
+
+        if (data instanceof WalkupScanToCompDestinationResponse)
+        {
+            WalkupScanToCompDestinationResponse wstcdResponse = (WalkupScanToCompDestinationResponse) data;
+            if (wstcdResponse.getHostName() != null
+                    && wstcdResponse.getHostName().equalsIgnoreCase(InetAddress.getLocalHost().getHostName()))
             {
-                // инициализируем
-                Object data = factory.createData(response);
-
-                if (data instanceof WalkupScanToCompDestinationResponse)
+                if (wstcdResponse.getResourceURI() != null)
                 {
-                    WalkupScanToCompDestinationResponse wstcdResponse = (WalkupScanToCompDestinationResponse) data;
-
-                    if (wstcdResponse.getHostName() != null
-                            && wstcdResponse.getHostName().equalsIgnoreCase(InetAddress.getLocalHost().getHostName()))
-                    {
-                        if (wstcdResponse.getResourceURI() != null)
-                        {
-                            registredURL = wstcdResponse.getResourceURI();
-                        }
-                    }
-                }
-                // обработаем
-                List<IEventRequest> events = factory.createExecutor().execute(data);
-
-                // при необходимости наполним очередь запросов
-                for (IEventRequest event2 : events)
-                {
-                    requestQueue.add(event2);
+                    registredURL = wstcdResponse.getResourceURI();
                 }
             }
+        }
+        // обработаем
+        List<IEventRequest> events = factory.createExecutor().execute(data);
+
+        // при необходимости наполним очередь запросов
+        for (IEventRequest event2 : events)
+        {
+            requestQueue.add(event2);
         }
     }
 
@@ -218,7 +197,7 @@ public class HPScan2Client
             CloseableHttpResponse response = httpClient.execute(host, getRequest);
             try
             {
-                executeResponse(event, response);
+                onEventResponse(event, response);
             }
             finally
             {
@@ -238,9 +217,9 @@ public class HPScan2Client
             HttpEntity entity = new StringEntity(helper.getBody(), ContentType.TEXT_XML);
             postRequest.setEntity(entity);
 
-            try(CloseableHttpResponse response = httpClient.execute(host, postRequest))
+            try (CloseableHttpResponse response = httpClient.execute(host, postRequest))
             {
-                executeResponse(event, response);
+                onEventResponse(event, response);
             }
         }
         else if (event.getHttpMethod().equals("DELETE"))
@@ -253,9 +232,9 @@ public class HPScan2Client
                 deleteRequest.setConfig(cfg);
             }
 
-            try(CloseableHttpResponse response = httpClient.execute(host, deleteRequest))
+            try (CloseableHttpResponse response = httpClient.execute(host, deleteRequest))
             {
-                executeResponse(event, response);
+                onEventResponse(event, response);
             }
         }
     }

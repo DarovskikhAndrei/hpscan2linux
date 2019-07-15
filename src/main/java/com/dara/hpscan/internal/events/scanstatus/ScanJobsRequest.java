@@ -5,12 +5,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.dara.hpscan.IRequestBodyProvider;
 import com.dara.hpscan.SettingsProvider;
 import com.dara.hpscan.StateService;
 
 public class ScanJobsRequest implements IRequestBodyProvider
 {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ScanJobsRequest.class);
+
 	public ScanJobsRequest()
 	{
 		m_profile = StateService.getInstance().getProfile();
@@ -37,13 +42,11 @@ public class ScanJobsRequest implements IRequestBodyProvider
 		}
 		catch (FileNotFoundException e)
 		{
-			System.err.println("file " + m_profile + " not found");
-			// e.printStackTrace();
+			LOGGER.error("file {} not found");
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("io exception", e);
 		}
 
 		return "";
