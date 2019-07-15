@@ -46,7 +46,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>HPScan2Linux.HPScan2Linux.HPScan2Linux</mainClass>
+							<mainClass>com.dara.hpscan.HPScan2Linux</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
