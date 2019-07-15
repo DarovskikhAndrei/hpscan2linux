@@ -53,4 +53,13 @@ public final class ResponseExecutor
 
         return null;
     }
+
+    static public String getXMLParam(Document doc, String tag)
+    {
+        NodeList elems = doc.getElementsByTagName(tag);
+        if (elems != null && elems.getLength() > 0)
+            return elems.item(0).getTextContent();
+
+        return null;
+    }
 }

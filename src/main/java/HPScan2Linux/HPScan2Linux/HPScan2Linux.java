@@ -21,7 +21,7 @@ public class HPScan2Linux
 			return;
 		}
 
-		SettingsProvider settings = SettingsProvider.getSettings();
+		ISettings settings = SettingsProvider.getSettings();
     	HPScan2Client client =  new HPScan2Client();
     	client.init(settings.getPrinterAddr(), settings.getPrinterPort());
 

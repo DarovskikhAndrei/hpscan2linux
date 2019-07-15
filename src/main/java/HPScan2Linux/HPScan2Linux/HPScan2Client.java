@@ -166,7 +166,7 @@ public class HPScan2Client
     }
 
     private void executeResponse(IEvent event, CloseableHttpResponse response)
-            throws ClientProtocolException, IOException
+            throws IOException
     {
         if (response.getStatusLine().getStatusCode() < 400)
         {
