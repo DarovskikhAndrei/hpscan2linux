@@ -1,5 +1,6 @@
 package com.dara.hpscan.internal.events.def;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.dara.hpscan.internal.events.IEventRequest;
@@ -10,6 +11,9 @@ public final class DefaultEventResponseAction implements IResponseAction<Default
     @Override
     public List<IEventRequest> execute(DefaultEventResponse defaultEventResponse)
     {
+        if (defaultEventResponse == null)
+            return Collections.emptyList();
+
         return defaultEventResponse.getSubEvents();
     }
 }

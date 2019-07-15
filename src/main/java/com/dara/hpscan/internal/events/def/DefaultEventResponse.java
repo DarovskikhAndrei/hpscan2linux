@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import com.dara.hpscan.internal.events.EventFactory;
 import org.apache.http.HttpResponse;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -53,7 +54,7 @@ public final class DefaultEventResponse
                 Element elem = (Element) elems.item(index);
                 if (elem != null)
                 {
-                    events.add(DefaultEventRequest.from(elem));
+                    events.add(EventFactory.fromElement(elem));
                 }
             }
 

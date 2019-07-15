@@ -12,14 +12,15 @@ public class ScanJobsRequestFactory implements IEventRequestFactory
     public static final ScanJobsRequestFactory INSTANCE = new ScanJobsRequestFactory();
 
     @Override
-    public boolean acept(String url)
+    public boolean aсcept(String url)
     {
         return url.equals("/Scan/Jobs");
     }
 
     @Override
-    public IEventRequest create(String url, String type, IRequestBodyProvider IRequestBodyProvider)
+    public IEventRequest create(String url, String type, String method,
+                                IRequestBodyProvider requestBodyProvider)
     {
-        return new ScanJobsRequest(url);
+        return new ScanJobsRequest(url, method, requestBodyProvider);
     }
 }

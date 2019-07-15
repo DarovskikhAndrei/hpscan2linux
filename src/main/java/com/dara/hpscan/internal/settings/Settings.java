@@ -10,6 +10,7 @@ public final class Settings implements ISettings
     private final String profilesPath;
     private final String proxyHost;
     private final int proxyPort;
+    private final String loggingCfgFileName;
 
     @Override
     public String getPathForScanSave()
@@ -47,8 +48,14 @@ public final class Settings implements ISettings
         return proxyPort;
     }
 
+    @Override
+    public String getLoggingCfgFileName()
+    {
+        return loggingCfgFileName;
+    }
+
     public Settings(String path2ScanSave, String printerAddress, int printerPort, String profilesPath,
-                    String proxyHost, int proxyPort)
+                    String proxyHost, int proxyPort, String loggingCfgFileName)
     {
         this.path2ScanSave = path2ScanSave;
         this.printerAddress = printerAddress;
@@ -56,5 +63,6 @@ public final class Settings implements ISettings
         this.profilesPath = profilesPath;
         this.proxyHost = proxyHost;
         this.proxyPort = proxyPort;
+        this.loggingCfgFileName = loggingCfgFileName;
     }
 }

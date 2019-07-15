@@ -5,7 +5,7 @@ import com.dara.hpscan.internal.events.IEventRequest;
 import com.dara.hpscan.internal.events.IEventRequestFactory;
 
 /**
- * Данные запроса готовности результата сканирования
+ * Событие начала сканирования
  */
 public final class WalkupScanToCompEventRequestFactory implements IEventRequestFactory
 {
@@ -17,13 +17,14 @@ public final class WalkupScanToCompEventRequestFactory implements IEventRequestF
     }
 
     @Override
-    public boolean acept(String url)
+    public boolean aсcept(String url)
     {
         return url.startsWith("/WalkupScanToComp/WalkupScanToCompEvent");
     }
 
     @Override
-    public IEventRequest create(String url, String type, IRequestBodyProvider IRequestBodyProvider)
+    public IEventRequest create(String url, String type, String method,
+                                IRequestBodyProvider IRequestBodyProvider)
     {
         return new WalkupScanToCompEventRequest(url);
     }

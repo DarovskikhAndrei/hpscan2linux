@@ -17,13 +17,14 @@ public final class ScanJobListRequestFactory implements IEventRequestFactory
     }
 
     @Override
-    public boolean acept(String url)
+    public boolean aсcept(String url)
     {
         return url.startsWith("/Jobs/JobList/");
     }
 
     @Override
-    public IEventRequest create(String url, String type, IRequestBodyProvider IRequestBodyProvider)
+    public IEventRequest create(String url, String type, String method,
+                                IRequestBodyProvider IRequestBodyProvider)
     {
         return new ScanJobListRequest(url);
     }

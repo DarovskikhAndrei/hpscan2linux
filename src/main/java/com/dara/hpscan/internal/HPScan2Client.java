@@ -52,16 +52,14 @@ public final class HPScan2Client implements AutoCloseable
             try
             {
                 executeEvent(EventFactory.createEvent("/WalkupScanToComp/WalkupScanToCompDestinations"));
-                executeEvent(new DefaultEventRequest(registredURL, "", "DELETE"));
+                executeEvent(EventFactory.createEvent(registredURL, "", "DELETE", null));
                 LOGGER.info("Registration deleted {}", registredURL);
 
                 registredURL = null;
             }
-            catch (ClientProtocolException e)
+            catch (Exception e)
             {
-            }
-            catch (IOException e)
-            {
+                LOGGER.info("delete registration error", e);
             }
         }
 

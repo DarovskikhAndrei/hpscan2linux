@@ -1,11 +1,11 @@
 package com.dara.hpscan.internal.events.jobs;
 
+import com.dara.hpscan.StateService;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 
-import com.dara.hpscan.StateService;
-import com.sun.org.apache.xerces.internal.util.URI;
-import com.sun.org.apache.xerces.internal.util.URI.MalformedURIException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Данные ответа на задачу сканирования
@@ -36,7 +36,7 @@ public final class ScanJobsResponse
                         return new ScanJobsResponse(uriPath);
 
                     }
-                    catch (MalformedURIException e)
+                    catch (URISyntaxException e)
                     {
                         e.printStackTrace();
                     }

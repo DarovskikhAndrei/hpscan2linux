@@ -1,11 +1,18 @@
 package com.dara.hpscan.internal.events.compevent;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 
 import org.apache.http.HttpResponse;
 import org.w3c.dom.Document;
 
 import com.dara.hpscan.internal.ResponseExecutorHelper;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 public final class WalkupScanToCompEventResponse
 {

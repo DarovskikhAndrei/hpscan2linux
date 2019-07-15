@@ -2,6 +2,7 @@ package com.dara.hpscan.internal.events.compdest;
 
 import java.io.InputStream;
 
+import com.dara.hpscan.StateService;
 import org.apache.http.HttpResponse;
 import org.w3c.dom.Document;
 
@@ -22,6 +23,11 @@ public final class WalkupScanToCompDestinationResponse
 
     public static WalkupScanToCompDestinationResponse create(HttpResponse response)
     {
+        if (response.getEntity() == null)
+            return null;
+        if (response.getEntity().getContentLength() == 0)
+            return null;
+
         try(InputStream inStream = ResponseExecutorHelper.getBodyStream(response))
         {
             Document doc = ResponseExecutorHelper.getXMLDocument(inStream);
@@ -34,6 +40,8 @@ public final class WalkupScanToCompDestinationResponse
             String scanProfile = ResponseExecutorHelper.getXMLParam(doc, "Shortcut",
                     "http://www.hp.com/schemas/imaging/con/ledm/walkupscan/2010/09/28");
             String resourceURI = ResponseExecutorHelper.getXMLParam(doc, "ResourceURI", "http://www.hp.com/schemas/imaging/con/dictionaries/1.0/");
+
+            StateService.getInstance().setProfile(scanProfile);
 
             return new WalkupScanToCompDestinationResponse(hostname, scanProfile, resourceURI);
         }

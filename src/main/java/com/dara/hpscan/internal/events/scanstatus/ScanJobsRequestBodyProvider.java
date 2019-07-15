@@ -12,11 +12,11 @@ import com.dara.hpscan.IRequestBodyProvider;
 import com.dara.hpscan.SettingsProvider;
 import com.dara.hpscan.StateService;
 
-public class ScanJobsRequest implements IRequestBodyProvider
+public class ScanJobsRequestBodyProvider implements IRequestBodyProvider
 {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ScanJobsRequest.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ScanJobsRequestBodyProvider.class);
 
-	public ScanJobsRequest()
+	public ScanJobsRequestBodyProvider()
 	{
 		m_profile = StateService.getInstance().getProfile();
 	}

@@ -12,6 +12,11 @@ public final class ScanStatusResponseFactory implements IEventResultFactory<Scan
 {
     public static final ScanStatusResponseFactory INSTANCE = new ScanStatusResponseFactory();
 
+    private ScanStatusResponseFactory()
+    {
+
+    }
+
     @Override
     public ScanStatusResponse createData(HttpResponse response)
     {

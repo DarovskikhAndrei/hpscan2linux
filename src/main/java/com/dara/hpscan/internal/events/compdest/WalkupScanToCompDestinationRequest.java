@@ -13,11 +13,11 @@ public class WalkupScanToCompDestinationRequest implements IEventRequest
     private final String resourceURL;
     private final String method;
 
-    public WalkupScanToCompDestinationRequest(String resourceURL, IRequestBodyProvider IRequestBodyProvider)
+    public WalkupScanToCompDestinationRequest(String resourceURL, String method, IRequestBodyProvider IRequestBodyProvider)
     {
         this.resourceURL = resourceURL;
         this.IRequestBodyProvider = IRequestBodyProvider;
-        this.method = IRequestBodyProvider == null ? "GET" : "POST";
+        this.method = method;
     }
 
     @Override

@@ -43,6 +43,7 @@ public final class LinuxSettingsFactory implements ISettingsFactory
             String profilesPath;
             String proxyHost;
             int proxyPort;
+            String logCfgPath;
 
             path2ScanSave = ResponseExecutorHelper.getXMLParam(doc, "scanpath");
             if (path2ScanSave == null)
@@ -79,8 +80,10 @@ public final class LinuxSettingsFactory implements ISettingsFactory
                 proxyPort = 0;
             else
                 throw new IllegalStateException("proxy config invalid");
+            logCfgPath = ResponseExecutorHelper.getXMLParam(doc, "logCfgPath");
 
-            return new Settings(path2ScanSave, printerAddress, printerPort, profilesPath, proxyHost, proxyPort);
+            LOGGER.info("Settings loaded");
+            return new Settings(path2ScanSave, printerAddress, printerPort, profilesPath, proxyHost, proxyPort, logCfgPath);
         }
         catch (Exception e)
         {

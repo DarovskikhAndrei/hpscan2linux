@@ -12,14 +12,15 @@ public class GetScanResultRequestFactory implements IEventRequestFactory
     public static final GetScanResultRequestFactory INSTANCE = new GetScanResultRequestFactory();
 
     @Override
-    public boolean acept(String url)
+    public boolean aсcept(String url)
     {
         // TODO. номер работы тут может меняться?
         return url.startsWith("/Scan/Jobs/1/Pages");
     }
 
     @Override
-    public IEventRequest create(String url, String type, IRequestBodyProvider IRequestBodyProvider)
+    public IEventRequest create(String url, String type, String method,
+                                IRequestBodyProvider IRequestBodyProvider)
     {
         return new GetScanResultRequest(url);
     }

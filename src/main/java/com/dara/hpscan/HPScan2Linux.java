@@ -1,6 +1,7 @@
 package com.dara.hpscan;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.logging.LogManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,27 @@ public final class HPScan2Linux
         }
 
         ISettings settings = SettingsProvider.getSettings();
+
+        if (settings.getLoggingCfgFileName() != null)
+        {
+            File cfgFile = new File(settings.getLoggingCfgFileName());
+            if (cfgFile.exists())
+            {
+                try (InputStream is = new FileInputStream(cfgFile))
+                {
+                    LogManager.getLogManager().readConfiguration(is);
+                }
+                catch (FileNotFoundException e)
+                {
+                    e.printStackTrace();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         try (HPScan2Client client = new HPScan2Client())
         {
             client.init(settings.getPrinterAddr(), settings.getPrinterPort());

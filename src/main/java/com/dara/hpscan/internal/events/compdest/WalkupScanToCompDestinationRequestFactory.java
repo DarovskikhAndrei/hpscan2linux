@@ -14,14 +14,15 @@ public final class WalkupScanToCompDestinationRequestFactory implements IEventRe
     public static final WalkupScanToCompDestinationRequestFactory INSTANCE = new WalkupScanToCompDestinationRequestFactory();
 
     @Override
-    public boolean acept(String url)
+    public boolean aсcept(String url)
     {
         return url.startsWith("/WalkupScanToComp/WalkupScanToCompDestinations");
     }
 
     @Override
-    public IEventRequest create(String url, String type, IRequestBodyProvider IRequestBodyProvider)
+    public IEventRequest create(String url, String type, String method,
+                                IRequestBodyProvider IRequestBodyProvider)
     {
-        return new WalkupScanToCompDestinationRequest(url, IRequestBodyProvider);
+        return new WalkupScanToCompDestinationRequest(url, method, IRequestBodyProvider);
     }
 }

@@ -14,13 +14,14 @@ public final class DefaultEventRequestFactory implements IEventRequestFactory
     public static final DefaultEventRequestFactory INSTANCE = new DefaultEventRequestFactory();
 
     @Override
-    public boolean acept(String url)
+    public boolean aсcept(String url)
     {
         return true;
     }
 
     @Override
-    public IEventRequest create(String url, String type, IRequestBodyProvider IRequestBodyProvider)
+    public IEventRequest create(String url, String type, String method,
+                                IRequestBodyProvider IRequestBodyProvider)
     {
         return new DefaultEventRequest(url, type);
     }

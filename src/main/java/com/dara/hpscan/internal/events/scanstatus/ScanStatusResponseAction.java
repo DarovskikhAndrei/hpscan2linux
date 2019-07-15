@@ -23,7 +23,9 @@ public final class ScanStatusResponseAction implements IResponseAction<ScanStatu
         if (response.idle()
                 && StateService.getInstance().getProfile() != null)
         {
-            return Arrays.asList(EventFactory.createEvent("/Scan/Jobs", "", new ScanJobsRequest()));
+            IEventRequest event = EventFactory.createEvent("/Scan/Jobs", "", new ScanJobsRequestBodyProvider());
+            if (event != null)
+                return Arrays.asList(event);
         }
 
         return Collections.emptyList();

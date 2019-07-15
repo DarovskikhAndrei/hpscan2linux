@@ -17,13 +17,14 @@ public final class ScanStatusRequestFactory implements IEventRequestFactory
     }
 
     @Override
-    public boolean acept(String url)
+    public boolean aсcept(String url)
     {
         return url.equals("/Scan/Status");
     }
 
     @Override
-    public IEventRequest create(String url, String type, IRequestBodyProvider IRequestBodyProvider)
+    public IEventRequest create(String url, String type, String method,
+                                IRequestBodyProvider IRequestBodyProvider)
     {
         return new ScanStatusRequest(url);
     }

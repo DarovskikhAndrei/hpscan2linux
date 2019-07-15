@@ -84,7 +84,7 @@ public final class ScanJobListResponse
 
     public boolean canceled()
     {
-        return jobState != null || jobState.equalsIgnoreCase("canceled");
+        return jobState == null || jobState.equalsIgnoreCase("canceled");
     }
 
     public String getJobURL()

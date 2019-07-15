@@ -10,6 +10,13 @@ import com.dara.hpscan.internal.events.IResponseAction;
  */
 public final class ScanJobsResponseFactory implements IEventResultFactory<ScanJobsResponse>
 {
+    public static final ScanJobsResponseFactory INSTANCE = new ScanJobsResponseFactory();
+
+    private ScanJobsResponseFactory()
+    {
+
+    }
+
     @Override
     public ScanJobsResponse createData(HttpResponse response)
     {

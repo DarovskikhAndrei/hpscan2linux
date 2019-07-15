@@ -10,6 +10,13 @@ import com.dara.hpscan.internal.events.IResponseAction;
  */
 public final class WalkupScanToCompEventResponseFactory implements IEventResultFactory<WalkupScanToCompEventResponse>
 {
+    public static final WalkupScanToCompEventResponseFactory INSTANCE = new WalkupScanToCompEventResponseFactory();
+
+    private WalkupScanToCompEventResponseFactory()
+    {
+
+    }
+
     @Override
     public WalkupScanToCompEventResponse createData(HttpResponse response)
     {

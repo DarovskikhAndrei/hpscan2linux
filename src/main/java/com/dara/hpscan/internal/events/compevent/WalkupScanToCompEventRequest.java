@@ -32,7 +32,7 @@ public final class WalkupScanToCompEventRequest implements IEventRequest
     @Override
     public IEventResultFactory getEventResultFactory()
     {
-        return ScanJobListResponseFactory.INSTANCE;
+        return WalkupScanToCompEventResponseFactory.INSTANCE;
     }
 
     @Override

@@ -17,36 +17,6 @@ public class DefaultEventRequest implements IEventRequest
     private final String resourceURI;
     private final String method;
 
-    public static DefaultEventRequest from(Element elem)
-    {
-        final String httpMethod;
-        final IEventResultFactory eventResultFactory;
-        String resourceType = "";
-        String resourceURI = "";
-
-        NodeList childs = elem.getChildNodes();
-        for (int childIndex = 0; childIndex < childs.getLength(); ++childIndex)
-        {
-            Node node = childs.item(childIndex);
-            if (node.getNodeType() == Node.ELEMENT_NODE)
-            {
-                Element childElem = (Element) node;
-                if (childElem != null)
-                {
-                    if (childElem.getLocalName().equalsIgnoreCase("ResourceType"))
-                    {
-                        resourceType = childElem.getTextContent();
-                    }
-                    else if (childElem.getLocalName().equalsIgnoreCase("ResourceURI"))
-                    {
-                        resourceURI = childElem.getTextContent();
-                    }
-                }
-            }
-        }
-
-        return new DefaultEventRequest(resourceURI, resourceType);
-    }
 
     public DefaultEventRequest(String url, String type, String method)
     {

@@ -13,4 +13,6 @@ public interface ISettings
     String getProxyHost();
 
     int getProxyPort();
+
+    String getLoggingCfgFileName();
 }

@@ -11,10 +11,14 @@ import com.dara.hpscan.internal.events.scanresult.GetScanResultResponseFactory;
 public class ScanJobsRequest implements IEventRequest
 {
     private final String resourceURI;
+    private final String method;
+    private final IRequestBodyProvider requestBodyProvider;
 
-    public ScanJobsRequest(String url)
+    public ScanJobsRequest(String url, String method, IRequestBodyProvider requestBodyProvider)
     {
         this.resourceURI = url;
+        this.method = method;
+        this.requestBodyProvider = requestBodyProvider;
     }
 
     @Override
@@ -26,18 +30,18 @@ public class ScanJobsRequest implements IEventRequest
     @Override
     public String getHttpMethod()
     {
-        return "GET";
+        return method;
     }
 
     @Override
     public IEventResultFactory getEventResultFactory()
     {
-        return GetScanResultResponseFactory.INSTANCE;
+        return ScanJobsResponseFactory.INSTANCE;
     }
 
     @Override
     public IRequestBodyProvider getIRequestBodyProvider()
     {
-        return null;
+        return requestBodyProvider;
     }
 }

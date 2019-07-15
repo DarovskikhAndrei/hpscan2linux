@@ -10,13 +10,13 @@ public interface IEventRequestFactory
     /**
      * Возвращает признак применимости заданного url к объектам этой фабрики
      */
-    boolean acept(String url);
+    boolean aсcept(String url);
 
     /**
      * Создать объект по url
-     *
-     * @param url адрес ресурса
+     *  @param url адрес ресурса
      * @param type тип ресурса
+     * @param method
      */
-    IEventRequest create(String url, String type, IRequestBodyProvider IRequestBodyProvider);
+    IEventRequest create(String url, String type, String method, IRequestBodyProvider IRequestBodyProvider);
 }
