@@ -11,6 +11,7 @@ public final class SettingsProvider
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsProvider.class);
 
+    private static Object locker = new Object();
     private volatile static SettingsProvider settingsProvider;
 
     private volatile ISettings settings;
@@ -19,7 +20,8 @@ public final class SettingsProvider
     {
         if (settingsProvider != null)
             return settingsProvider.settings();
-        synchronized (settingsProvider)
+
+        synchronized (locker)
         {
             if (settingsProvider == null)
                 settingsProvider = new SettingsProvider();
