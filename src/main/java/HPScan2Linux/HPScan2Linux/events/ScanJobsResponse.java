@@ -8,13 +8,15 @@ import com.sun.org.apache.xerces.internal.util.URI.MalformedURIException;
 
 import HPScan2Linux.HPScan2Linux.StateService;
 
-public final class ScanJobsResponse extends ResponseExecutor
+/**
+ * Данные ответа на задачу сканирования
+ */
+public final class ScanJobsResponse
 {
+    private final String url;
 
-    @Override
-    public void init(HttpResponse response)
+    public static ScanJobsResponse create(HttpResponse response)
     {
-        m_url = null;
         if (response != null)
         {
             Header[] headers = response.getAllHeaders();
@@ -27,9 +29,12 @@ public final class ScanJobsResponse extends ResponseExecutor
                     try
                     {
                         uri = new URI(url);
-                        if (uri != null)
-                            m_url = uri.getPath();
-                        StateService.getInstance().setJobURL(m_url);
+                        final String uriPath = uri.getPath();
+
+                        // TODO. Надо от этого избавиться
+                        StateService.getInstance().setJobURL(uriPath);
+
+                        return new ScanJobsResponse(uriPath);
 
                     }
                     catch (MalformedURIException e)
@@ -41,14 +46,17 @@ public final class ScanJobsResponse extends ResponseExecutor
                 }
             }
         }
+
+        return null;
     }
 
-    @Override
-    public void execute()
+    private ScanJobsResponse(String url)
     {
-        if (m_url != null)
-            m_events.add(EventFactory.createEvent(m_url));
+        this.url = url;
     }
 
-    private String m_url;
+    public String getUrl()
+    {
+        return url;
+    }
 }

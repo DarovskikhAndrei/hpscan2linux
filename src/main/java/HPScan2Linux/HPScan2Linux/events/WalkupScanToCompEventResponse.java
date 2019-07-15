@@ -1,60 +1,45 @@
 package HPScan2Linux.HPScan2Linux.events;
 
-import java.io.IOException;
 import java.io.InputStream;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.HttpResponse;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
-public final class WalkupScanToCompEventResponse extends ResponseExecutor
+public final class WalkupScanToCompEventResponse
 {
-    @Override
-    public void execute()
+    private final String eventType;
+
+    public static WalkupScanToCompEventResponse create(HttpResponse response)
     {
-        if (m_eventType.equalsIgnoreCase("ScanRequested"))
+        try(InputStream inStream = ResponseExecutor.getBodyStream(response))
         {
-            m_events.add(EventFactory.createEvent("/Scan/Status"));
+            Document doc = ResponseExecutor.getXMLDocument(inStream);
+
+            final String eventType = ResponseExecutor.getXMLParam(doc, "WalkupScanToCompEventType",
+                    "http://www.hp.com/schemas/imaging/con/ledm/walkupscan/2010/09/28");
+
+            return new WalkupScanToCompEventResponse(eventType);
         }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
-    @Override
-    public void init(HttpResponse response)
+    private WalkupScanToCompEventResponse(String eventType)
     {
-        InputStream inStream = getBodyStream(response);
-        if (inStream == null)
-            return;
-
-        try
-        {
-            Document doc = getXMLDocument(inStream);
-
-            m_eventType = getXMLParam(doc, "WalkupScanToCompEventType",
-                    "http://www.hp.com/schemas/imaging/con/ledm/walkupscan/2010/09/28");
-        }
-        catch (ParserConfigurationException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (SAXException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        this.eventType = eventType;
     }
 
     public String getEventType()
     {
-        return m_eventType;
+        return eventType;
     }
 
-    private String m_eventType;
+    public boolean scanRequested()
+    {
+        return eventType.equalsIgnoreCase("ScanRequested");
+    }
 }

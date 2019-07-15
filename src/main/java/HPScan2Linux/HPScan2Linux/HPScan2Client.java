@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import org.apache.http.HttpEntity;
@@ -22,188 +23,237 @@ import org.apache.http.impl.client.HttpClients;
 
 import HPScan2Linux.HPScan2Linux.events.Event;
 import HPScan2Linux.HPScan2Linux.events.EventFactory;
-import HPScan2Linux.HPScan2Linux.events.ResponseExecutor;
+import HPScan2Linux.HPScan2Linux.events.IEvent;
+import HPScan2Linux.HPScan2Linux.events.IEventResultFactory;
 import HPScan2Linux.HPScan2Linux.events.WalkupScanToCompDestinationResponse;
 
-public class HPScan2Client {
-	public HPScan2Client() {
-		m_requestQueue = new LinkedList<Event>();
-	}
+public class HPScan2Client
+{
+    private CloseableHttpClient httpClient;
 
-	private void do_init() {
-		System.err.println("init scaner");
+    private final Queue<IEvent> requestQueue = new LinkedList<>();
 
-		while (m_registredURL != null) {
-			try {
-				executeEvent(EventFactory.createEvent("/WalkupScanToComp/WalkupScanToCompDestinations"));
-				executeEvent(new Event(m_registredURL, "", "DELETE", null, null));
-				m_registredURL = null;
-				System.err.println("Deleted registration");
-			} catch (ClientProtocolException e) {
-			} catch (IOException e) {
-			}
-		}
+    private String registredURL;
 
-		// Сразу добавим событие для обработки сообщений
-		m_registredURL = null;
-		while (m_registredURL == null) {
-			try {
-				executeEvent(EventFactory.createEvent("/WalkupScanToComp/WalkupScanToCompDestinations",
-						new RegisterRequestBuilder()));
-				executeEvent(EventFactory.createEvent("/WalkupScanToComp/WalkupScanToCompDestinations"));
-			} catch (ClientProtocolException e) {
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e1) {
-				}
-			} catch (IOException e) {
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e1) {
-				}
-			}
-		}
-		System.err.println("Registred");
+    private String proxyHost;
+    private int proxyPort;
 
-		// Сразу добавим событие для обработки сообщений
-		m_requestQueue.add(EventFactory.createEvent("/EventMgmt/EventTable"));
-	}
+    private HttpHost host;
 
-	/* инициализация клиента */
-	public void init(String hostName, int port) {
-		m_httpClient = HttpClients.custom().disableAutomaticRetries().disableRedirectHandling()
-				.disableCookieManagement().build();
+    private void do_init()
+    {
+        System.err.println("init scaner");
 
-		m_host = new HttpHost(hostName, port, "http");
+        while (registredURL != null)
+        {
+            try
+            {
+                executeEvent(EventFactory.createEvent("/WalkupScanToComp/WalkupScanToCompDestinations"));
+                executeEvent(new Event(registredURL, "", "DELETE", null, null));
+                registredURL = null;
+                System.err.println("Deleted registration");
+            }
+            catch (ClientProtocolException e)
+            {
+            }
+            catch (IOException e)
+            {
+            }
+        }
 
-		m_proxyHost = SettingsProvider.getSettings().getProxyHost();
-		m_proxyPort = SettingsProvider.getSettings().getProxyPort();
+        // Сразу добавим событие для обработки сообщений
+        registredURL = null;
+        while (registredURL == null)
+        {
+            try
+            {
+                executeEvent(EventFactory.createEvent("/WalkupScanToComp/WalkupScanToCompDestinations",
+                        new RegisterRequestBuilder()));
+                executeEvent(EventFactory.createEvent("/WalkupScanToComp/WalkupScanToCompDestinations"));
+            }
+            catch (ClientProtocolException e)
+            {
+                try
+                {
+                    Thread.sleep(3000);
+                }
+                catch (InterruptedException e1)
+                {
+                }
+            }
+            catch (IOException e)
+            {
+                try
+                {
+                    Thread.sleep(3000);
+                }
+                catch (InterruptedException e1)
+                {
+                }
+            }
+        }
+        System.err.println("Registred");
 
-		do_init();
-	}
+        // Сразу добавим событие для обработки сообщений
+        requestQueue.add(EventFactory.createEvent("/EventMgmt/EventTable"));
+    }
 
-	/* закрытие клиента */
-	public void close() throws IOException {
-		// удаляем регистрацию
-		if (m_registredURL != null) {
-			System.err.println("close execute");
-			executeEvent(new Event(m_registredURL, "", "DELETE", null, null));
-		}
+    /* инициализация клиента */
+    public void init(String hostName, int port)
+    {
+        httpClient = HttpClients.custom().disableAutomaticRetries().disableRedirectHandling()
+                .disableCookieManagement().build();
 
-		m_httpClient.close();
-	}
+        host = new HttpHost(hostName, port, "http");
 
-	public void process() throws IOException {
-		try {
-			executeEvent(m_requestQueue.poll());
-		} catch (SocketTimeoutException e) {
-			System.err.println("timeout exception");
-			do_init();
-		} catch (HttpHostConnectException e) {
-			System.err.println("HttpHostConnectException exception");
-			do_init();
-		} catch (ClientProtocolException e) {
-			System.err.println("ClientProtocolException exception");
-			do_init();
-		} catch (IOException e) {
-			System.err.println("IOException exception");
-			do_init();
-		}
+        proxyHost = SettingsProvider.getSettings().getProxyHost();
+        proxyPort = SettingsProvider.getSettings().getProxyPort();
 
-		if (m_requestQueue.isEmpty()) {
-			try {
-				Thread.sleep(1200);
-			} catch (InterruptedException e) {
-			}
-			m_requestQueue.add(EventFactory.createEvent("/EventMgmt/EventTable"));
-		}
-	}
+        do_init();
+    }
 
-	private void executeResponse(Event event, CloseableHttpResponse response)
-			throws ClientProtocolException, IOException {
-		if (response.getStatusLine().getStatusCode() < 400) {
-			ResponseExecutor responseExecutor = event.getResponseExecutor();
-			if (responseExecutor != null) {
-				// инициализируем
-				responseExecutor.init(response);
+    /* закрытие клиента */
+    public void close() throws IOException
+    {
+        // удаляем регистрацию
+        if (registredURL != null)
+        {
+            System.err.println("close execute");
+            executeEvent(new Event(registredURL, "", "DELETE", null, null));
+        }
 
-				if (responseExecutor instanceof WalkupScanToCompDestinationResponse) {
-					WalkupScanToCompDestinationResponse wstcdResponse = (WalkupScanToCompDestinationResponse) responseExecutor;
+        httpClient.close();
+    }
 
-					if (wstcdResponse.getHostName() != null
-							&& wstcdResponse.getHostName().equalsIgnoreCase(InetAddress.getLocalHost().getHostName())) {
-						if (wstcdResponse.getResourceURI() != null) {
-							m_registredURL = wstcdResponse.getResourceURI();
-						}
-					}
-				}
-				// обработаем
-				responseExecutor.execute();
+    public void process() throws IOException
+    {
+        try
+        {
+            executeEvent(requestQueue.poll());
+        }
+        catch (SocketTimeoutException e)
+        {
+            System.err.println("timeout exception");
+            do_init();
+        }
+        catch (HttpHostConnectException e)
+        {
+            System.err.println("HttpHostConnectException exception");
+            do_init();
+        }
+        catch (ClientProtocolException e)
+        {
+            System.err.println("ClientProtocolException exception");
+            do_init();
+        }
+        catch (IOException e)
+        {
+            System.err.println("IOException exception");
+            do_init();
+        }
 
-				// при необходимости наполним очередь запросов
-				for (Event event2 : responseExecutor.getEvents()) {
-					m_requestQueue.add(event2);
-				}
-			}
-		}
-	}
+        if (requestQueue.isEmpty())
+        {
+            try
+            {
+                Thread.sleep(1200);
+            }
+            catch (InterruptedException e)
+            {
+            }
+            requestQueue.add(EventFactory.createEvent("/EventMgmt/EventTable"));
+        }
+    }
 
-	private void executeEvent(Event event) throws ClientProtocolException, IOException {
-		if (event.getHttpMethod().equals("GET")) {
-			HttpGet getRequest = new HttpGet(event.getResourceURI());
-			if (m_proxyHost != null) {
-				HttpHost proxy = new HttpHost(m_proxyHost, m_proxyPort, "http");
-				RequestConfig cfg = RequestConfig.custom().setProxy(proxy).build();
-				getRequest.setConfig(cfg);
-			}
-			CloseableHttpResponse response = m_httpClient.execute(m_host, getRequest);
-			try {
-				executeResponse(event, response);
-			} finally {
-				response.close();
-			}
-		} else if (event.getHttpMethod().equals("POST")) {
-			RequestHelper helper = event.getRequestHelper();
-			HttpPost postRequest = new HttpPost(event.getResourceURI());
-			if (m_proxyHost != null) {
-				HttpHost proxy = new HttpHost(m_proxyHost, m_proxyPort, "http");
-				RequestConfig cfg = RequestConfig.custom().setProxy(proxy).build();
-				postRequest.setConfig(cfg);
-			}
-			HttpEntity entity = new StringEntity(helper.getBody(), ContentType.TEXT_XML);
-			postRequest.setEntity(entity);
+    private void executeResponse(IEvent event, CloseableHttpResponse response)
+            throws ClientProtocolException, IOException
+    {
+        if (response.getStatusLine().getStatusCode() < 400)
+        {
+            IEventResultFactory factory = event.getEventResultFactory();
+            if (factory != null)
+            {
+                // инициализируем
+                Object data = factory.createData(response);
 
-			CloseableHttpResponse response = m_httpClient.execute(m_host, postRequest);
-			try {
-				executeResponse(event, response);
-			} finally {
-				response.close();
-			}
-		} else if (event.getHttpMethod().equals("DELETE")) {
-			HttpDelete deleteRequest = new HttpDelete(event.getResourceURI());
-			if (m_proxyHost != null) {
-				HttpHost proxy = new HttpHost(m_proxyHost, m_proxyPort, "http");
-				RequestConfig cfg = RequestConfig.custom().setProxy(proxy).build();
-				deleteRequest.setConfig(cfg);
-			}
-			CloseableHttpResponse response = m_httpClient.execute(m_host, deleteRequest);
-			try {
-				executeResponse(event, response);
-			} finally {
-				response.close();
-			}
-		}
-	}
+                if (data instanceof WalkupScanToCompDestinationResponse)
+                {
+                    WalkupScanToCompDestinationResponse wstcdResponse = (WalkupScanToCompDestinationResponse) data;
 
-	private CloseableHttpClient m_httpClient;
+                    if (wstcdResponse.getHostName() != null
+                            && wstcdResponse.getHostName().equalsIgnoreCase(InetAddress.getLocalHost().getHostName()))
+                    {
+                        if (wstcdResponse.getResourceURI() != null)
+                        {
+                            registredURL = wstcdResponse.getResourceURI();
+                        }
+                    }
+                }
+                // обработаем
+                List<IEvent> events = factory.createExecutor().execute(data);
 
-	private String m_registredURL;
+                // при необходимости наполним очередь запросов
+                for (IEvent event2 : events)
+                {
+                    requestQueue.add(event2);
+                }
+            }
+        }
+    }
 
-	private String m_proxyHost;
-	private int m_proxyPort;
+    private void executeEvent(IEvent event) throws ClientProtocolException, IOException
+    {
+        if (event.getHttpMethod().equals("GET"))
+        {
+            HttpGet getRequest = new HttpGet(event.getResourceURL());
+            if (proxyHost != null)
+            {
+                HttpHost proxy = new HttpHost(proxyHost, proxyPort, "http");
+                RequestConfig cfg = RequestConfig.custom().setProxy(proxy).build();
+                getRequest.setConfig(cfg);
+            }
+            CloseableHttpResponse response = httpClient.execute(host, getRequest);
+            try
+            {
+                executeResponse(event, response);
+            }
+            finally
+            {
+                response.close();
+            }
+        }
+        else if (event.getHttpMethod().equals("POST"))
+        {
+            RequestHelper helper = event.getRequestHelper();
+            HttpPost postRequest = new HttpPost(event.getResourceURL());
+            if (proxyHost != null)
+            {
+                HttpHost proxy = new HttpHost(proxyHost, proxyPort, "http");
+                RequestConfig cfg = RequestConfig.custom().setProxy(proxy).build();
+                postRequest.setConfig(cfg);
+            }
+            HttpEntity entity = new StringEntity(helper.getBody(), ContentType.TEXT_XML);
+            postRequest.setEntity(entity);
 
-	private HttpHost m_host;
+            try(CloseableHttpResponse response = httpClient.execute(host, postRequest))
+            {
+                executeResponse(event, response);
+            }
+        }
+        else if (event.getHttpMethod().equals("DELETE"))
+        {
+            HttpDelete deleteRequest = new HttpDelete(event.getResourceURL());
+            if (proxyHost != null)
+            {
+                HttpHost proxy = new HttpHost(proxyHost, proxyPort, "http");
+                RequestConfig cfg = RequestConfig.custom().setProxy(proxy).build();
+                deleteRequest.setConfig(cfg);
+            }
 
-	// Очередь запросов.
-	private Queue<Event> m_requestQueue;
+            try(CloseableHttpResponse response = httpClient.execute(host, deleteRequest))
+            {
+                executeResponse(event, response);
+            }
+        }
+    }
 }

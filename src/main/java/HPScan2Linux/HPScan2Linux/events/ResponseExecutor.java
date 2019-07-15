@@ -3,6 +3,7 @@ package HPScan2Linux.HPScan2Linux.events;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -14,36 +15,17 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public abstract class ResponseExecutor
+public final class ResponseExecutor
 {
-    public ResponseExecutor()
-    {
-        m_events = new ArrayList<Event>();
-    }
+    protected final List<Event> events = new ArrayList<Event>();
 
-    public abstract void init(HttpResponse response);
-
-    public abstract void execute();
-
-    static public InputStream getBodyStream(HttpResponse response)
+    static public InputStream getBodyStream(HttpResponse response) throws IOException
     {
         HttpEntity entity = response.getEntity();
-        if (entity != null)
-        {
-            InputStream inStream = null;
-            try
-            {
-                inStream = entity.getContent();
-            }
-            catch (UnsupportedOperationException | IOException e)
-            {
-            }
-            if (entity.getContentLength() != 0)
-            {
-                return inStream;
-            }
-        }
-        return null;
+        if (entity == null)
+            throw new IllegalStateException();
+
+        return entity.getContent();
     }
 
     static public Document getXMLDocument(InputStream inStream)
@@ -71,11 +53,4 @@ public abstract class ResponseExecutor
 
         return null;
     }
-
-    public ArrayList<Event> getEvents()
-    {
-        return m_events;
-    }
-
-    protected ArrayList<Event> m_events;
 }

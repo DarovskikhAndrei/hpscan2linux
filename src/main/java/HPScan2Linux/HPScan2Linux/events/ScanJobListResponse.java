@@ -13,58 +13,40 @@ import org.xml.sax.SAXException;
 
 import HPScan2Linux.HPScan2Linux.StateService;
 
-public final class ScanJobListResponse extends ResponseExecutor
+/**
+ * Данные запроса готовности результата сканирования
+ */
+public final class ScanJobListResponse
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventFactory.class);
-    
-    @Override
-    public void execute()
+
+    private final String jobURL;
+    private final String jobCategory;
+    private final String jobState;
+    private final String jobSource;
+    private final String jobPageState;
+    private final String jobBinaryURL;
+
+    public static ScanJobListResponse create(HttpResponse response)
     {
-        // если задание не выполнено.. повторим запрос.
-
-        if (m_jobPageState != null && m_jobPageState.equalsIgnoreCase("ReadyToUpload"))
+        try(InputStream inStream = ResponseExecutor.getBodyStream(response))
         {
-            System.err.println("Add download event with url: " + m_jobBinaryURL);
-            m_events.add(new Event(m_jobBinaryURL, "", "GET", new GetScanResultResponse(), null));
-        }
-        else if (m_jobState != null && m_jobState.equalsIgnoreCase("canceled"))
-        {
-            m_events.add(EventFactory.createEvent("/EventMgmt/EventTable"));
-        }
-        else
-        {
-            m_events.add(EventFactory.createEvent(m_jobURL));
-            try
-            {
-                Thread.sleep(500);
-            }
-            catch (InterruptedException e)
-            {
-            }
-        }
-    }
+            Document doc = ResponseExecutor.getXMLDocument(inStream);
 
-    @Override
-    public void init(HttpResponse response)
-    {
-        InputStream inStream = getBodyStream(response);
-        if (inStream == null)
-            return;
-
-        try
-        {
-            Document doc = getXMLDocument(inStream);
-
-            m_jobURL = getXMLParam(doc, "JobUrl", "http://www.hp.com/schemas/imaging/con/ledm/jobs/2009/04/30");
-            m_jobCategory = getXMLParam(doc, "JobCategory",
+            final String jobURL = ResponseExecutor.getXMLParam(doc, "JobUrl", "http://www.hp.com/schemas/imaging/con/ledm/jobs/2009/04/30");
+            final String jobCategory = ResponseExecutor.getXMLParam(doc, "JobCategory",
                     "http://www.hp.com/schemas/imaging/con/ledm/jobs/2009/04/30");
-            m_jobState = getXMLParam(doc, "JobState", "http://www.hp.com/schemas/imaging/con/ledm/jobs/2009/04/30");
-            m_jobSource = getXMLParam(doc, "JobSource", "http://www.hp.com/schemas/imaging/con/ledm/jobs/2009/04/30");
-            m_jobPageState = getXMLParam(doc, "PageState", "http://www.hp.com/schemas/imaging/con/cnx/scan/2008/08/19");
-            m_jobBinaryURL = getXMLParam(doc, "BinaryURL", "http://www.hp.com/schemas/imaging/con/cnx/scan/2008/08/19");
-            StateService.getInstance().setBinaryURL(m_jobBinaryURL);
+            final String jobState = ResponseExecutor.getXMLParam(doc, "JobState", "http://www.hp.com/schemas/imaging/con/ledm/jobs/2009/04/30");
+            final String jobSource = ResponseExecutor.getXMLParam(doc, "JobSource", "http://www.hp.com/schemas/imaging/con/ledm/jobs/2009/04/30");
+            final String jobPageState = ResponseExecutor.getXMLParam(doc, "PageState", "http://www.hp.com/schemas/imaging/con/cnx/scan/2008/08/19");
+            final String jobBinaryURL = ResponseExecutor.getXMLParam(doc, "BinaryURL", "http://www.hp.com/schemas/imaging/con/cnx/scan/2008/08/19");
 
-            LOGGER.info("JobList result:\n  {}\n  {}", m_jobPageState, m_jobBinaryURL);
+            LOGGER.info("JobList result:\n  {}\n  {}", jobPageState, jobBinaryURL);
+
+            // TODO. Надо избавиться от этого состояния
+            StateService.getInstance().setBinaryURL(jobBinaryURL);
+
+            return new ScanJobListResponse(jobURL, jobCategory, jobState, jobSource, jobPageState, jobBinaryURL);
         }
         catch (ParserConfigurationException e)
         {
@@ -78,42 +60,48 @@ public final class ScanJobListResponse extends ResponseExecutor
         {
             LOGGER.error(e.getMessage());
         }
+
+        return null;
+    }
+
+    private ScanJobListResponse(String jobURL, String jobCategory, String jobState, String jobSource,
+                                String jobPageState, String jobBinaryURL)
+    {
+        this.jobURL = jobURL;
+        this.jobCategory = jobCategory;
+        this.jobState = jobState;
+        this.jobSource = jobSource;
+        this.jobPageState = jobPageState;
+        this.jobBinaryURL = jobBinaryURL;
+    }
+
+    public boolean readyToUpload()
+    {
+        return jobPageState != null && jobPageState.equalsIgnoreCase("ReadyToUpload");
+    }
+
+    public boolean canceled()
+    {
+        return jobState != null || jobState.equalsIgnoreCase("canceled");
     }
 
     public String getJobURL()
     {
-        return m_jobURL;
+        return jobURL;
     }
 
     public String getJobCategory()
     {
-        return m_jobCategory;
-    }
-
-    public String getJobState()
-    {
-        return m_jobState;
+        return jobCategory;
     }
 
     public String getJobSource()
     {
-        return m_jobSource;
-    }
-
-    public String getJobPageState()
-    {
-        return m_jobPageState;
+        return jobSource;
     }
 
     public String getJobBinaryURL()
     {
-        return m_jobBinaryURL;
+        return jobBinaryURL;
     }
-
-    private String m_jobURL;
-    private String m_jobCategory;
-    private String m_jobState;
-    private String m_jobSource;
-    private String m_jobPageState;
-    private String m_jobBinaryURL;
 }

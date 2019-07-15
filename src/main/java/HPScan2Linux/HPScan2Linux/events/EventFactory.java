@@ -36,7 +36,7 @@ public class EventFactory
                          requestHelper);
     }
 
-    public static ResponseExecutor getResponseExecutor(String resourceURI, String resourceType)
+    public static IEventResultFactory getResponseExecutor(String resourceURI, String resourceType)
     {
         if (resourceURI == null)
         {
@@ -47,22 +47,22 @@ public class EventFactory
         if (resourceURI.equals("/EventMgmt/EventTable") || resourceURI.equals("/EventMgmt/EventTable?timeout=1200"))
         {
             LOGGER.info("Url: {} Event: {}", resourceURI, "EventResponse");
-            return new EventResponse();
+            return new DefaultEventResponseFactory();
         }
         else if (resourceURI.equals("/WalkupScanToComp/WalkupScanToCompDestinations"))
         {
             LOGGER.info("Url: {} Event: {}", resourceURI, "WalkupScanToCompDestinationResponse");
-            return new WalkupScanToCompDestinationResponse();
+            return new WalkupScanToCompDestinationResponseFactory();
         }
         else if (resourceURI.equals("/WalkupScanToComp/WalkupScanToCompEvent"))
         {
             LOGGER.info("Url: {} Event: {}", resourceURI, "WalkupScanToCompEventResponse");
-            return new WalkupScanToCompEventResponse();
+            return new WalkupScanToCompEventResponseFactory();
         }
         else if (resourceURI.equals("/WalkupScanToComp/WalkupScanToCompCaps"))
         {
             LOGGER.info("Url: {} Event: {}", resourceURI, "WalkupScanToCompCapsResponse");
-            return new WalkupScanToCompCapsResponse();
+            return new WalkupScanToCompCapsResponseFactory();
         }
 
         else if (resourceURI.equals("/DevMgmt/DiscoveryTree.xml"))
@@ -78,19 +78,19 @@ public class EventFactory
         else if (resourceURI.equals("/Scan/Jobs"))
         {
             LOGGER.info("Url: {} Event: {}", resourceURI, "ScanJobsResponse");
-            return new ScanJobsResponse();
+            return new ScanJobsResponseFactory();
         }
         else if (resourceURI.equals("/Scan/Status"))
         {
             LOGGER.info("Url: {} Event: {}", resourceURI, "ScanStatusResponse");
-            return new ScanStatusResponse();
+            return new ScanStatusResponseFactory();
         }
 
         String subStr = resourceURI.substring(0, (new String("/Jobs/JobList/")).length());
         if (subStr.equals("/Jobs/JobList/"))
         {
             LOGGER.info("Url: {} Event: {}", resourceURI, "ScanJobListResponse");
-            return new ScanJobListResponse();
+            return new ScanJobListResponseFactory();
         }
 
         // номер работы тут может меняться.
@@ -98,13 +98,13 @@ public class EventFactory
         if (resourceURI.equals("/Scan/Jobs/1/Pages"))
         {
             LOGGER.info("Url: {} Event: {}", resourceURI, "GetScanResultResponse");
-            return new GetScanResultResponse();
+            return new GetScanResultResponseFactory();
         }
         subStr = resourceURI.substring(0, (new String("/WalkupScanToComp/WalkupScanToCompDestinations")).length());
         if (subStr.equals("/WalkupScanToComp/WalkupScanToCompDestinations"))
         {
             LOGGER.info("Url: {} Event: {}", resourceURI, "WalkupScanToCompDestinationResponse");
-            return new WalkupScanToCompDestinationResponse();
+            return new WalkupScanToCompDestinationResponseFactory();
         }
 
         LOGGER.info("Url: {} Event: {}", resourceURI, "null");

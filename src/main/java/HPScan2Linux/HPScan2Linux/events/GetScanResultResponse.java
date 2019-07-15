@@ -1,47 +1,34 @@
 package HPScan2Linux.HPScan2Linux.events;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import HPScan2Linux.HPScan2Linux.internal.FileNameResolver;
-import HPScan2Linux.HPScan2Linux.internal.FileNameResolverFactory;
 import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import HPScan2Linux.HPScan2Linux.SettingsProvider;
 import HPScan2Linux.HPScan2Linux.StateService;
+import HPScan2Linux.HPScan2Linux.internal.FileNameResolverFactory;
 
-public final class GetScanResultResponse extends ResponseExecutor
+/**
+ * Результат сканирования
+ */
+public final class GetScanResultResponse
 {
     private static final int kBlockSize = 8192;
     private static final Logger LOGGER = LoggerFactory.getLogger(EventFactory.class);
     
-    @Override
-    public void execute()
+    public static GetScanResultResponse create(HttpResponse response)
     {
-    }
-
-    @Override
-    public void init(HttpResponse response)
-    {
-        InputStream inStream = getBodyStream(response);
-        if (inStream == null)
-            return;
-
         String path = SettingsProvider.getSettings().getPathForScanSave();
         String fileName = getFileName();
         String fullFileName = path + fileName;
 
-        try (FileOutputStream fos = new FileOutputStream(fullFileName))
+        try(InputStream inStream = ResponseExecutor.getBodyStream(response);
+                FileOutputStream fos = new FileOutputStream(fullFileName))
         {
             int readed;
             int pos = 0;
@@ -68,9 +55,11 @@ public final class GetScanResultResponse extends ResponseExecutor
             StateService.getInstance().setJobURL(null);
             StateService.getInstance().setProfile(null);
         }
+
+        return null;
     }
 
-    private String getFileName()
+    private static String getFileName()
     {
         return FileNameResolverFactory.createDefault().getFileName(StateService.getInstance());
     }
