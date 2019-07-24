@@ -31,7 +31,7 @@ public final class ScanJobListResponseAction implements IResponseAction<ScanJobL
         {
             try
             {
-                Thread.sleep(500);
+                wait(500);
             }
             catch (InterruptedException e)
             {

@@ -77,7 +77,7 @@ public final class HPScan2Client implements AutoCloseable
             {
                 try
                 {
-                    Thread.sleep(1000);
+                    wait(1000);
                 }
                 catch (InterruptedException e1)
                 {
@@ -134,7 +134,7 @@ public final class HPScan2Client implements AutoCloseable
         {
             try
             {
-                Thread.sleep(1200);
+                wait(1200);
             }
             catch (InterruptedException e)
             {
